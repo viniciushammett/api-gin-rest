@@ -16,3 +16,13 @@ func Saudacao(c *gin.Context) {
 		"API diz:": "E ai " + nome + ", tudo beleza?",
 	})
 }
+
+func CriaNovoAluno(c *gin.Context) {
+	var aluno models.Aluno
+	if err := c.ShouldBindJSON(&aluno); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"erro": err.Error()})
+	}
+	database.DB.Create(&aluno)
+	c.JSON(http.StatusOK, aluno)
+}
