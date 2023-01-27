@@ -52,7 +52,7 @@ func DeletaAluno(c *gin.Context) {
 	})
 }
 
-func EditaAluno (c gin*Context) {
+func EditaAluno (c *gin.Context) {
 	var aluno models.Aluno
 	id := c.Params.ByName("id")
 	database.DB.First(&aluno, id)
@@ -65,5 +65,20 @@ func EditaAluno (c gin*Context) {
 	}
 
 	database.DB.Model(&aluno).UpdateColumns(aluno)
+	c.JSON(http.StatusOK, aluno)
+}
+
+func BuscaAlunoPorCPF(c *gin.Context) {
+	var aluno models.Aluno
+	cpf := c.Param("cpf")
+	database.DB.Where(&models.Aluno{CPF: cpf}).First(&aluno)
+
+	if aluno == 0 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"Not Found": "Aluno não encontrado"
+			return
+		})
+	}
+
 	c.JSON(http.StatusOK, aluno)
 }
