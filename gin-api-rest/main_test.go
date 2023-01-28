@@ -1,9 +1,12 @@
 package main
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"github.com/gin-gonic/gin"
 	"gin-api-rest/controllers"
+	"github.com/stretchr/testify/assert"
 )
 
 func SetupDasRotasDeTeste() *gin.Engine {
@@ -17,8 +20,6 @@ func TestVerificaStatusCodeDaSaudacaoComParametro(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/vini", nil)
 	resposta := httptest.NewRecorder()
 	r.ServeHTTP(resposta, req)
-	if resposta.Code != http.StatusOK {
-		t.Fatalf("Status error: Valor recebido foi %d e o esperado era %d", resposta.Code, http.StatusOK)
-	}
+	assert.Equal(t, http.StatusOK, resposta.Code)
 
 }
