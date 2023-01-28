@@ -6,27 +6,27 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func ExibeTodosAlunos(c *gin.Context) {
+func Saudacoes(c *gin.Context) {
+	nome := c.Params.ByName("nome")
+	c.JSON(200, gin.H{
+		"API diz": "E ai " + nome + ", Tudo beleza?",
+	})
+}
+
+func TodosAlunos(c *gin.Context) {
 	var alunos []models.Aluno
 	database.DB.Find(&alunos)
 	c.JSON(200, alunos)
 }
 
-func Saudacao(c *gin.Context) {
-	nome := c.Params.ByName("nome")
-	c.JSON(200, gin.H{
-		"API diz:": "E ai " + nome + ", tudo beleza?",
-	})
-}
-
-func CriaNovoAluno(c *gin.Context) {
+func CriarNovoAluno(c *gin.Context) {
 	var aluno models.Aluno
 	if err := c.ShouldBindJSON(&aluno); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"erro": err.Error()})
 		return
 	}
-	if err := models.ValidaDadosDeAluno(&aluno); err!= nil {
+	if err := models.ValidaDadosDeAluno(&aluno); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"erro": err.Error()})
 		return
@@ -35,47 +35,40 @@ func CriaNovoAluno(c *gin.Context) {
 	c.JSON(http.StatusOK, aluno)
 }
 
-func BuscaAlunoPorID(c *gin.Context) {
+func BuscarAlunoPorID(c *gin.Context) {
 	var aluno models.Aluno
 	id := c.Params.ByName("id")
 	database.DB.First(&aluno, id)
-
-	if aluno == 0 {
+	if aluno.ID == 0 {
 		c.JSON(http.StatusNotFound, gin.H{
-			"Not Found": "Aluno não encontrado"
-		})
+			"Not Found": "Aluno não encontrado"})
+		return
 	}
-	
 	c.JSON(http.StatusOK, aluno)
 }
 
-func DeletaAluno(c *gin.Context) {
-	var aluno models.aluno
+func DeletarAluno(c *gin.Context) {
+	var aluno models.Aluno
 	id := c.Params.ByName("id")
 	database.DB.Delete(&aluno, id)
-	c.JSON(http.StatusOK, gin.H{
-		"data:":"Aluno deletado com sucesso"
-	})
+	c.JSON(http.StatusOK, gin.H{"data": "Aluno deletado com sucesso"})
 }
 
-func EditaAluno (c *gin.Context) {
+func EditarAluno(c *gin.Context) {
 	var aluno models.Aluno
 	id := c.Params.ByName("id")
 	database.DB.First(&aluno, id)
-	
 	if err := c.ShouldBindJSON(&aluno); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":err.Error()
-		})
-		return
-	}
-	if err := models.ValidaDadosDeAluno(&aluno); err!= nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"erro": err.Error()})
 		return
 	}
-
-	database.DB.Model(&aluno).UpdateColumns(aluno)
+	if err := models.ValidaDadosDeAluno(&aluno); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"erro": err.Error()})
+		return
+	}
+	database.DB.Save(&aluno)
 	c.JSON(http.StatusOK, aluno)
 }
 
@@ -84,12 +77,22 @@ func BuscaAlunoPorCPF(c *gin.Context) {
 	cpf := c.Param("cpf")
 	database.DB.Where(&models.Aluno{CPF: cpf}).First(&aluno)
 
-	if aluno == 0 {
+	if aluno.ID == 0 {
 		c.JSON(http.StatusNotFound, gin.H{
-			"Not Found": "Aluno não encontrado"
-			return
-		})
+			"Not Found": "Aluno não encontrado"})
+		return
 	}
-
 	c.JSON(http.StatusOK, aluno)
+}
+
+func ExibePaginaIndex(c *gin.Context) {
+	var alunos []models.Aluno
+	database.DB.Find(&alunos)
+	c.HTML(http.StatusOK, "index.html", gin.H{
+		"alunos": alunos,
+	})
+}
+
+func RotaNaoEncontrada(c *gin.Context) {
+	c.HTML(http.StatusNotFound, "404.html", nil)
 }

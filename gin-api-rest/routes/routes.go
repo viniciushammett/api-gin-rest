@@ -6,14 +6,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func HandleRequests() {
+func HandleRequest() {
 	r := gin.Default()
-	r.GET("/alunos", controllers.ExibeTodosAlunos)
-	r.GET("/:nome", controllers.Saudacao)
-	r.POST("/alunos", controllers.CriaNovoAluno)
-	r.GET("/alunos/:id", controllers.BuscaAlunoPorID)
-	r.DELETE("/alunos/:id", controllers.DeletaAluno)
-	r.PATCH("/alunos/:id", controllers.EditaAluno)
+	r.LoadHTMLGlob("templates/*")
+	r.Static("/assets", "./assets")
+	r.GET("/:nome", controllers.Saudacoes)
+	r.GET("/alunos", controllers.TodosAlunos)
+	r.GET("/alunos/:id", controllers.BuscarAlunoPorID)
+	r.POST("/alunos", controllers.CriarNovoAluno)
+	r.DELETE("/alunos/:id", controllers.DeletarAluno)
+	r.PATCH("/alunos/:id", controllers.EditarAluno)
 	r.GET("/alunos/cpf/:cpf", controllers.BuscaAlunoPorCPF)
+	r.GET("/alunos/", controllers.BuscaAlunoPorCPF)
+	r.GET("/index", controllers.ExibePaginaIndex)
+	r.NoRoute(controllers.RotaNaoEncontrada)
 	r.Run()
 }
