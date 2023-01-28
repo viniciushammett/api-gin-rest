@@ -21,5 +21,7 @@ func TestVerificaStatusCodeDaSaudacaoComParametro(t *testing.T) {
 	resposta := httptest.NewRecorder()
 	r.ServeHTTP(resposta, req)
 	assert.Equal(t, http.StatusOK, resposta.Code)
-
+	mockDaResposta := `{"API diz":"E ai gui, Tudo beleza?"}`
+	respostaBody, _ := ioutil.ReadAll(resposta.Body)
+	assert.Equal(t, mockDaResposta, respostaBody)
 }
